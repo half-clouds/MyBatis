@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itheima.mapper.BrandMapper">
+
+
+    <resultMap id="resultMap" type="brand">
+        <result column="brand_name" property="brandName"/>
+        <result column="company_name" property="companyName"/>
+    </resultMap>
+
+
+    <!--    id :选择语句的唯一标识-->
+    <!--    resultType： 返回值类型-->
+    <!--    select：查询语句-->
+    <select id="selectAll" resultMap="resultMap">
+        select *
+        from tb_brand
+    </select>
+
+
+    <select id="selectById" resultMap="resultMap">
+        select *
+        from tb_brand
+        where id = #{id}
+    </select>
+
+    <select id="selectByCondi" resultMap="resultMap">
+        select *
+        from tb_brand
+        -- where
+        <where>
+            <if test="if status != null">
+                and status = #{status}
+            </if>
+            <if test="if  brandName != null and brandName != ''">
+                and brand_name like #{brandName}
+            </if>
+            <if test="if  companyName != null and companyName != ''">
+                and company_name like #{companyName}
+            </if>
+
+        </where>
+    </select>
+
+    <!--    查询三个条件，若只有一个不为空，其余为空时，查询操作如下：-->
+    <select id="selectByCondiBrand" resultMap="resultMap">
+        select *
+        from tb_brand
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="brandName != null and brandName != ''">
+                and brand_name like #{brandName}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                and company_name like #{companyName}
+            </if>
+
+        </where>
+    </select>
+
+    <select id="selectByCondiMap" resultMap="resultMap">
+        select *
+        from tb_brand
+        where status = #{status}
+          and brand_name like #{brandName}
+          and company_name like #{companyName}
+    </select>
+
+    <!--    单条件动态查询，多个条件只有一个生效,就是写Switch case 语句 choose when操作-->
+    <select id="selectBySingleCondi" resultMap="resultMap">
+        select *
+        from tb_brand
+        <where>
+            <choose>
+                <when test="status != null">
+                    status = #{status}
+                </when>
+                <when test="brandName != null and brandName != ''">
+                    brand_name like #{brandName}
+                </when>
+                <when test="companyName != null and companyName != ''">
+                    company_name like #{companyName}
+                </when>
+            </choose>
+        </where>
+    </select>
+
+    <!--    插入数据-->
+    <!--    返回插入数据的主键，useGeneratedKeys置为true keyProperty指向要返回的数据-->
+    <insert id="add" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_brand(brand_name, company_name, ordered, description, status)
+        values (#{brandName}, #{companyName}, #{ordered}, #{description}, #{status})
+    </insert>
+
+    <!--    修改全部数据-->
+    <update id="update">
+        update tb_brand
+        set company_name = #{companyName},
+            brand_name   = #{brandName},
+            ordered      = #{ordered},
+            status       = #{status},
+            description  = #{description}
+        where id = #{id};
+    </update>
+
+    <!--    动态修改字段-->
+    <update id="update1">
+        update tb_brand
+        <set>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="brandName != null and brandName != ''">
+                brand_name = #{brandName},
+            </if>
+            <if test="companyName != null and companyName != ''">
+                company_name = #{companyName},
+            </if>
+            <if test="ordered != null">
+                ordered = #{ordered},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <!--    删除一条数据-->
+    <delete id="deleteById">
+        delete
+        from tb_brand
+        where id = #{id}
+    </delete>
+
+    <!--    批量删除数据-->
+    <delete id="deleteByIds">
+        delete from tb_brand
+        where id in
+        (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
+</mapper>
